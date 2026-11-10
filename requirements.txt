@@ -1,0 +1,29 @@
+# ==============================================================================
+# Comparative Analysis of Brain MRI Image Restoration Techniques
+# Project Dependencies (Python >= 3.10)
+# ==============================================================================
+
+# Deep Learning Framework
+torch>=2.0.0
+
+# Scientific Computing & Data Processing
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Computer Vision & Medical Image Processing
+scikit-image>=0.20.0
+opencv-python>=4.8.0
+pillow>=10.0.0
+
+# Plotting & Visualization
+matplotlib>=3.7.0
+
+# Interactive Web Application
+flask>=3.0.0
+werkzeug>=3.0.0
+
+# Jupyter Notebook Execution & Export
+nbformat>=5.9.0
+nbclient>=0.8.0
+ipykernel>=6.25.0

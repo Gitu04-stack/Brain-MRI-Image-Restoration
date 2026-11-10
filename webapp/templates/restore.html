@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Image Restoration - Brain MRI Restoration System{% endblock %}
+{% block header_title %}Restoration Filtering Engine{% endblock %}
+{% block header_subtitle %}Apply classical statistical, spatial, and patch-based restoration filters to the degraded slice{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Controls Column -->
+    <div class="col-lg-5">
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i> Restoration Algorithms</h5>
+            </div>
+            <div class="content-card-body">
+                <form action="{{ url_for('apply_restoration_action') }}" method="POST">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Select Restoration Filter</label>
+                        <select name="restoration_method" class="form-select form-select-lg mb-2" required>
+                            <option value="wiener" {% if selected_res == 'wiener' or not selected_res %}selected{% endif %}>Adaptive Wiener Filter (5×5 Window) [Rank #1 Benchmark]</option>
+                            <option value="median_filter" {% if selected_res == 'median_filter' %}selected{% endif %}>Spatial Median Filter (3×3 Kernel)</option>
+                            <option value="nlm" {% if selected_res == 'nlm' %}selected{% endif %}>Non-Local Means (NLM Denoising, h=10)</option>
+                            <option value="lanczos_sharpening" {% if selected_res == 'lanczos_sharpening' %}selected{% endif %}>Lanczos Edge Sharpening (Unsharp Mask)</option>
+                        </select>
+                    </div>
+
+                    <div class="alert alert-secondary small border mb-4">
+                        <strong class="d-block mb-1 text-dark"><i class="fa-solid fa-circle-info text-primary me-1"></i> Objective Metric Evaluation:</strong>
+                        Restoration quality is evaluated by comparing the restored output directly against the clean ground-truth reference using MSE, PSNR (dB), and SSIM.
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                            <i class="fa-solid fa-play me-2"></i> Execute Restoration Filter
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <!-- Run All Methods Button -->
+                <form action="{{ url_for('apply_all_restorations_action') }}" method="POST">
+                    <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-semibold">
+                        <i class="fa-solid fa-layer-group me-2"></i> Run All 4 Methods (Comparative Run)
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if restored_metrics %}
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-chart-line text-success me-2"></i> Measured Restoration Performance</h5>
+            </div>
+            <div class="content-card-body">
+                <div class="row g-2 text-center mb-3">
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">PSNR</small>
+                            <span class="fs-5 fw-bold text-success">{{ restored_metrics.psnr|round(2) }} dB</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">SSIM</small>
+                            <span class="fs-5 fw-bold text-primary">{{ restored_metrics.ssim|round(4) }}</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">MSE</small>
+                            <span class="fs-5 fw-bold text-secondary">{{ restored_metrics.mse|round(4) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('compare_page') }}" class="btn btn-success fw-semibold">
+                        <i class="fa-solid fa-table-columns me-2"></i> View Side-by-Side Comparison
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Images Display Column -->
+    <div class="col-lg-7">
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-images text-primary me-2"></i> Degraded vs. Restored Inspection</h5>
+            </div>
+            <div class="content-card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="image-box-wrapper">
+                            {% if degraded_image_url %}
+                            <img src="{{ degraded_image_url }}" alt="Degraded MRI">
+                            <div class="image-box-label text-danger">Input Degraded Slice</div>
+                            {% else %}
+                            <div class="p-5 text-muted">No degraded slice available. Please generate one first.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="image-box-wrapper">
+                            {% if restored_image_url %}
+                            <img src="{{ restored_image_url }}" alt="Restored MRI">
+                            <div class="image-box-label text-success">
+                                Restored Output ({{ selected_res|replace('_', ' ')|title }})
+                            </div>
+                            {% else %}
+                            <div class="p-5 text-muted">
+                                <i class="fa-solid fa-wand-magic fa-2x mb-2 text-secondary opacity-50 d-block"></i>
+                                Select a filter and execute to view restored slice
+                            </div>
+                            <div class="image-box-label text-muted">Restored Output</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

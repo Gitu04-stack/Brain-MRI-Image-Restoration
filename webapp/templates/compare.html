@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Results Comparison - Brain MRI Restoration System{% endblock %}
+{% block header_title %}Side-by-Side Visual & Statistical Comparison{% endblock %}
+{% block header_subtitle %}Direct visual inspection of anatomical fidelity across Clean Reference, Degraded Input, and Restored Outputs{% endblock %}
+
+{% block content %}
+<!-- Three-Way Triplet Comparison -->
+<div class="content-card mb-4">
+    <div class="content-card-header">
+        <h5 class="content-card-title"><i class="fa-solid fa-table-columns text-primary me-2"></i> Primary Triplet Comparison</h5>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('metrics_page') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fa-solid fa-calculator me-1"></i> Metric Deep Dive
+            </a>
+        </div>
+    </div>
+    <div class="content-card-body">
+        <div class="row g-3 text-center">
+            <!-- 1. Clean Reference -->
+            <div class="col-md-4">
+                <div class="image-box-wrapper h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="badge bg-success mb-2 px-3 py-1">Ground Truth</span>
+                        {% if clean_image_url %}
+                        <img src="{{ clean_image_url }}" alt="Clean Ground Truth">
+                        {% else %}
+                        <div class="p-5 text-muted">No clean slice loaded</div>
+                        {% endif %}
+                    </div>
+                    <div class="mt-3">
+                        <strong class="d-block text-dark">Clean Reference MRI</strong>
+                        <small class="text-muted">PSNR: $\infty$ | SSIM: 1.0000</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Degraded Slice -->
+            <div class="col-md-4">
+                <div class="image-box-wrapper h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="badge bg-danger mb-2 px-3 py-1">Degraded Input</span>
+                        {% if degraded_image_url %}
+                        <img src="{{ degraded_image_url }}" alt="Degraded MRI">
+                        {% else %}
+                        <div class="p-5 text-muted">No degraded slice generated</div>
+                        {% endif %}
+                    </div>
+                    <div class="mt-3">
+                        <strong class="d-block text-danger">Distorted Slice</strong>
+                        {% if deg_metrics %}
+                        <small class="text-danger fw-semibold">
+                            PSNR: {{ deg_metrics.psnr|round(2) }} dB | SSIM: {{ deg_metrics.ssim|round(4) }}
+                        </small>
+                        {% else %}
+                        <small class="text-muted">Awaiting degradation</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Restored Slice -->
+            <div class="col-md-4">
+                <div class="image-box-wrapper h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="badge bg-primary mb-2 px-3 py-1">Restored Output</span>
+                        {% if restored_image_url %}
+                        <img src="{{ restored_image_url }}" alt="Restored MRI">
+                        {% else %}
+                        <div class="p-5 text-muted">No restored output generated</div>
+                        {% endif %}
+                    </div>
+                    <div class="mt-3">
+                        <strong class="d-block text-primary">Restored: {{ selected_res|replace('_', ' ')|title or 'Traditional' }}</strong>
+                        {% if restored_metrics %}
+                        <small class="text-success fw-semibold">
+                            PSNR: {{ restored_metrics.psnr|round(2) }} dB | SSIM: {{ restored_metrics.ssim|round(4) }}
+                        </small>
+                        {% else %}
+                        <small class="text-muted">Awaiting restoration</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Multi-Method Comparison Grid (If All Methods Run) -->
+{% if multi_results %}
+<div class="content-card">
+    <div class="content-card-header">
+        <h5 class="content-card-title"><i class="fa-solid fa-layer-group text-primary me-2"></i> Multi-Method Spatial Restoration Comparison</h5>
+    </div>
+    <div class="content-card-body">
+        <div class="row g-4">
+            {% for key, res in multi_results.items() %}
+            <div class="col-md-6 col-xl-3 text-center">
+                <div class="image-box-wrapper">
+                    <img src="{{ res.url }}" alt="{{ res.name }}">
+                    <div class="mt-2">
+                        <strong class="d-block text-dark small fw-bold">{{ res.name }}</strong>
+                        <div class="d-flex justify-content-center gap-1 mt-1">
+                            <span class="badge bg-success-subtle text-success border small">{{ res.psnr|round(2) }} dB</span>
+                            <span class="badge bg-primary-subtle text-primary border small">SSIM {{ res.ssim|round(4) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

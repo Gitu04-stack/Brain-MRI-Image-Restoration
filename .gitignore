@@ -1,0 +1,66 @@
+# ==============================================================================
+# Brain MRI Image Restoration Project - .gitignore
+# BCA Capstone Project: Comparative Analysis of Brain MRI Image Restoration
+# ==============================================================================
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Python virtual environments
+venv/
+env/
+.venv/
+.conda/
+
+# Environment secrets & local configurations
+.env
+.env.*
+!.env.example
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+*/*/.ipynb_checkpoints/
+
+# Original & Generated Medical MRI Datasets (Extremely Large: 7,200 Clean + 50,400 Degraded)
+dataset/
+degraded/
+scratch/
+models/
+
+# Model Checkpoints & Serialized Weights
+*.pth
+*.pt
+*.ckpt
+*.onnx
+outputs/models/
+
+# Large Experiment Metric Tables (>20 MB to 85 MB master tables)
+outputs/metrics/*_metrics*.csv
+outputs/metrics/*_standardized*.csv
+outputs/metrics/*_metrics_master.csv
+
+# Generated Intermediate Sample Images (Tens of thousands of PNG slices)
+outputs/samples/
+
+# Local backup files & logs
+*.bak
+*.tmp
+*.log
+*-Copy*
+*-Copy1.*
+
+# Operating System & IDE metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Flask Application Uploads (Preserve directory structure via .gitkeep)
+instance/
+*.sqlite3
+webapp/static/uploads/*
+!webapp/static/uploads/.gitkeep

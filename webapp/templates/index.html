@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Brain MRI Restoration System{% endblock %}
+{% block header_title %}Project Overview & Research Dashboard{% endblock %}
+{% block header_subtitle %}BCA Final Year Capstone Project — Comparative Analysis of Brain MRI Restoration{% endblock %}
+
+{% block content %}
+<!-- Project Hero Banner -->
+<div class="content-card mb-4">
+    <div class="content-card-body p-4 p-lg-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-radius: 12px;">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-primary px-3 py-2 rounded-pill mb-3 fw-bold">Academic Research Project</span>
+                <h2 class="fw-bold mb-3">Comparative Analysis of Brain MRI Image Restoration Techniques Under Different Degradation Conditions</h2>
+                <p class="text-light opacity-75 mb-4 leading-relaxed" style="font-size: 1.05rem;">
+                    This study investigates the mathematical modeling of physical and acquisition artifacts in clinical T1-weighted Brain MRI scans—including complex Rician noise, additive Gaussian perturbations, linear motion blur, and spatial low-resolution subsampling—and evaluates traditional spatial/statistical restoration techniques against deep residual U-Net architectures.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('upload_page') }}" class="btn btn-primary px-4 py-2 fw-semibold">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i> Upload MRI Slice
+                    </a>
+                    <a href="{{ url_for('benchmarks_page') }}" class="btn btn-outline-light px-4 py-2 fw-semibold">
+                        <i class="fa-solid fa-square-poll-vertical me-2"></i> Explore Benchmarks
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                <div class="p-3 rounded-4" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <i class="fa-solid fa-brain fa-4x text-primary mb-3"></i>
+                    <h5 class="fw-bold mb-1">Standardized MRI Pipeline</h5>
+                    <p class="small text-light opacity-75 mb-0">512 × 512 Normalized Grayscale Intensity [0.0, 1.0]</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Project Dataset Metrics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-blue">
+                <i class="fa-solid fa-images"></i>
+            </div>
+            <div class="stat-title">Verified Scans</div>
+            <div class="stat-value">7,200</div>
+            <div class="stat-subtitle">5,600 Train / 1,600 Test</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-amber">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="stat-title">Degradation Models</div>
+            <div class="stat-value">4 Types</div>
+            <div class="stat-subtitle">7 Severities (10% to 70%)</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-green">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="stat-title">Traditional Filters</div>
+            <div class="stat-value">4 Methods</div>
+            <div class="stat-subtitle">Wiener, Median, NLM, Lanczos</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-purple">
+                <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div class="stat-title">Deep Architecture</div>
+            <div class="stat-value">ResUNet</div>
+            <div class="stat-subtitle">1,926,433 Parameters</div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Benchmark Highlights -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="content-card h-100 mb-0">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-award text-warning me-2"></i> Phase 11 Traditional Baseline Champion</h5>
+            </div>
+            <div class="content-card-body">
+                <div class="p-3 rounded-3 bg-light border mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold fs-5 text-dark">Adaptive Wiener Filter (5×5)</span>
+                        <span class="badge bg-success px-3 py-1">Rank 1 Benchmark</span>
+                    </div>
+                    <p class="small text-muted mt-1 mb-0">
+                        Ranked #1 among all traditional restoration techniques across 44,800 combined testing conditions.
+                    </p>
+                </div>
+
+                <div class="row g-3 text-center">
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">Test PSNR</small>
+                            <span class="fs-5 fw-bold text-success">10.42 dB</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">Test SSIM</small>
+                            <span class="fs-5 fw-bold text-primary">0.1808</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">Test MSE</small>
+                            <span class="fs-5 fw-bold text-danger">0.1612</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h6 class="fw-bold small text-uppercase text-muted">Comparative Rankings:</h6>
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>1. Adaptive Wiener Filter</span>
+                            <span class="badge bg-success-subtle text-success">10.42 dB</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>2. 2D Median Filter (3×3)</span>
+                            <span class="badge bg-secondary-subtle text-secondary">10.13 dB</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>3. Non-Local Means (NLM)</span>
+                            <span class="badge bg-secondary-subtle text-secondary">8.82 dB</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>4. Lanczos Sharpening</span>
+                            <span class="badge bg-secondary-subtle text-secondary">6.91 dB</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="content-card h-100 mb-0">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-microchip text-primary me-2"></i> Deep Residual U-Net (ResUNet) Status</h5>
+            </div>
+            <div class="content-card-body">
+                <div class="p-3 rounded-3 bg-light border mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold fs-5 text-dark">Phase 12 PyTorch Engine</span>
+                        <span class="badge bg-primary px-3 py-1">CUDA RTX 2050</span>
+                    </div>
+                    <p class="small text-muted mt-1 mb-0">
+                        Trained on 35,280 paired scans with Edge-Preserving Charbonnier Loss and AdamW Cosine Annealing.
+                    </p>
+                </div>
+
+                <div class="row g-3 text-center">
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">Best Val PSNR</small>
+                            <span class="fs-5 fw-bold text-success">20.62 dB</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">Best Val SSIM</small>
+                            <span class="fs-5 fw-bold text-primary">0.4696</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">PSNR Gain</small>
+                            <span class="fs-5 fw-bold text-info">+10.20 dB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="alert alert-info border-info-subtle small mb-0">
+                        <i class="fa-solid fa-circle-check me-2"></i>
+                        <strong>Verified Finding:</strong> Deep ResUNet doubles the restoration PSNR (+10.20 dB gain) and more than doubles structural fidelity SSIM (+0.2888) over the best traditional spatial filter.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

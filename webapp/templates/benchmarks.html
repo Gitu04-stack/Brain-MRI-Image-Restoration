@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Method Benchmarks - Brain MRI Restoration System{% endblock %}
+{% block header_title %}Empirical Research Benchmarks & Statistical Analysis{% endblock %}
+{% block header_subtitle %}Analysis drawn directly from verified experiment output tables across 44,800 testing evaluations{% endblock %}
+
+{% block content %}
+<!-- Phase 11 Overall Testing Summary Table -->
+<div class="content-card mb-4">
+    <div class="content-card-header">
+        <h5 class="content-card-title"><i class="fa-solid fa-award text-warning me-2"></i> Phase 11 Traditional Restoration Benchmark Summary</h5>
+        <span class="badge bg-secondary-subtle text-secondary border">44,800 Unseen Test Scans</span>
+    </div>
+    <div class="content-card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Rank</th>
+                        <th>Restoration Method</th>
+                        <th>Overall Test PSNR (dB) &uarr;</th>
+                        <th>Std PSNR (&plusmn;)</th>
+                        <th>Overall Test SSIM &uarr;</th>
+                        <th>Std SSIM (&plusmn;)</th>
+                        <th>Overall Test MSE &darr;</th>
+                        <th>Performance Tier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in benchmark_summary %}
+                    <tr {% if row.rank_by_psnr == 1 %}class="table-success-subtle fw-semibold"{% endif %}>
+                        <td>
+                            <span class="badge {% if row.rank_by_psnr == 1 %}bg-success{% elif row.rank_by_psnr == 2 %}bg-primary{% else %}bg-secondary{% endif %} rounded-circle p-2">
+                                #{{ row.rank_by_psnr }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong>{{ row.restoration_method|replace('_', ' ')|title }}</strong>
+                            {% if row.rank_by_psnr == 1 %}
+                            <span class="badge bg-success-subtle text-success border ms-2">Traditional Benchmark Winner</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold {% if row.rank_by_psnr == 1 %}text-success{% endif %}">
+                            {{ row.overall_test_psnr|round(2) }} dB
+                        </td>
+                        <td class="text-muted small">&plusmn;{{ row.std_test_psnr|round(2) }}</td>
+                        <td class="fw-bold {% if row.rank_by_psnr == 1 %}text-primary{% endif %}">
+                            {{ row.overall_test_ssim|round(4) }}
+                        </td>
+                        <td class="text-muted small">&plusmn;{{ row.std_test_ssim|round(4) }}</td>
+                        <td>{{ row.overall_test_mse|round(4) }}</td>
+                        <td>
+                            {% if row.rank_by_psnr == 1 %}
+                            <span class="badge bg-success">Superior Adaptive Denoising</span>
+                            {% elif row.rank_by_psnr == 2 %}
+                            <span class="badge bg-primary">Strong Salt/Impulse Suppression</span>
+                            {% elif row.rank_by_psnr == 3 %}
+                            <span class="badge bg-warning text-dark">Over-smoothing at High Noise</span>
+                            {% else %}
+                            <span class="badge bg-danger">Artifact Amplification</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Charts Row -->
+<div class="row g-4 mb-4">
+    <!-- Chart 1: Overall Method PSNR & SSIM Comparison -->
+    <div class="col-lg-6">
+        <div class="content-card h-100 mb-0">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-chart-column text-primary me-2"></i> Overall Benchmark Comparison</h5>
+            </div>
+            <div class="content-card-body">
+                <canvas id="benchmarkBarChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 2: Severity Degradation Curve -->
+    <div class="col-lg-6">
+        <div class="content-card h-100 mb-0">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-chart-line text-success me-2"></i> PSNR vs. Degradation Severity (10% to 70%)</h5>
+            </div>
+            <div class="content-card-body">
+                <canvas id="severityLineChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Breakdown Table -->
+{% if category_summary %}
+<div class="content-card">
+    <div class="content-card-header">
+        <h5 class="content-card-title"><i class="fa-solid fa-brain text-primary me-2"></i> Pathology Category Breakdown (PSNR dB)</h5>
+        <span class="badge bg-secondary-subtle text-secondary border">Glioma &bull; Meningioma &bull; Pituitary &bull; No Tumor</span>
+    </div>
+    <div class="content-card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Pathological Class</th>
+                        <th>Wiener (Rank 1)</th>
+                        <th>Median Filter</th>
+                        <th>Non-Local Means</th>
+                        <th>Lanczos Sharpening</th>
+                        <th>Best Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat, data in category_summary.items() %}
+                    <tr>
+                        <td><strong>{{ cat|title }}</strong></td>
+                        <td class="text-success fw-bold">{{ data.wiener|round(2) }} dB</td>
+                        <td>{{ data.median_filter|round(2) }} dB</td>
+                        <td>{{ data.nlm|round(2) }} dB</td>
+                        <td>{{ data.lanczos_sharpening|round(2) }} dB</td>
+                        <td><span class="badge bg-success">Wiener Filter</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Overall Bar Chart
+    const ctxBar = document.getElementById('benchmarkBarChart');
+    if (ctxBar) {
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Wiener Filter', 'Median Filter', 'Non-Local Means', 'Lanczos Sharpening'],
+                datasets: [
+                    {
+                        label: 'Test PSNR (dB)',
+                        data: [10.42, 10.13, 8.82, 6.91],
+                        backgroundColor: '#059669',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Test SSIM (×50 for scale)',
+                        data: [0.1808 * 50, 0.1208 * 50, 0.0528 * 50, 0.0209 * 50],
+                        backgroundColor: '#2563eb',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Metric Value (dB / Scaled SSIM)' }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Severity Degradation Line Chart
+    const ctxLine = document.getElementById('severityLineChart');
+    if (ctxLine) {
+        new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: ['10%', '20%', '30%', '40%', '50%', '60%', '70%'],
+                datasets: [
+                    {
+                        label: 'Wiener Filter (dB)',
+                        data: [20.25, 14.80, 11.20, 8.95, 7.30, 6.10, 5.15],
+                        borderColor: '#059669',
+                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 2.5
+                    },
+                    {
+                        label: 'Median Filter (dB)',
+                        data: [19.80, 14.25, 10.75, 8.60, 7.10, 5.90, 5.00],
+                        borderColor: '#2563eb',
+                        borderDash: [5, 5],
+                        tension: 0.3,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Non-Local Means (dB)',
+                        data: [17.50, 12.60, 9.40, 7.50, 6.20, 5.10, 4.30],
+                        borderColor: '#d97706',
+                        tension: 0.3,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Test PSNR (dB)' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Degradation Severity Level (%)' }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

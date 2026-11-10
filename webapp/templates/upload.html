@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Image Upload - Brain MRI Restoration System{% endblock %}
+{% block header_title %}MRI Slice Upload & Data Intake{% endblock %}
+{% block header_subtitle %}Upload a clean clinical T1-weighted MRI slice (PNG/JPG) for restoration analysis{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Upload Box Column -->
+    <div class="col-lg-7">
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-cloud-arrow-up text-primary me-2"></i> Custom MRI Slice Upload</h5>
+            </div>
+            <div class="content-card-body">
+                <form id="imageUploadForm" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
+                    <div id="dropzone" class="dropzone-box" onclick="document.getElementById('imageFileInput').click();">
+                        <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+                        <h5 class="fw-bold text-dark mb-1">Click to browse or drag & drop MRI image</h5>
+                        <p class="text-muted small mb-0">Supports PNG, JPG, or JPEG up to 10 MB</p>
+                        <input type="file" id="imageFileInput" name="mri_image" accept=".png,.jpg,.jpeg" class="d-none">
+                    </div>
+
+                    <div id="uploadPreviewContainer" class="mt-4 p-3 border rounded text-center d-none bg-light">
+                        <span class="badge bg-secondary mb-2">Local File Selected</span>
+                        <div class="image-box-wrapper mx-auto" style="max-width: 320px;">
+                            <img id="uploadPreviewImage" src="#" alt="Upload Preview">
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-end gap-2">
+                        <button type="submit" id="uploadSubmitBtn" class="btn btn-primary px-4 py-2" disabled>
+                            <i class="fa-solid fa-upload me-2"></i> Process & Standardize Slice
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sample Slice Selector -->
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-database text-secondary me-2"></i> Or Select Verified Benchmark Sample</h5>
+            </div>
+            <div class="content-card-body">
+                <p class="small text-muted mb-3">
+                    Instantly load an authentic reference scan from the verified dataset testing archive without uploading local files:
+                </p>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <a href="{{ url_for('load_sample', category='glioma') }}" class="btn btn-outline-secondary w-100 text-start p-3 d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong class="d-block text-dark">Glioma Tumor</strong>
+                                <small class="text-muted">Sample: Te-gl_1.jpg</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="{{ url_for('load_sample', category='meningioma') }}" class="btn btn-outline-secondary w-100 text-start p-3 d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong class="d-block text-dark">Meningioma Tumor</strong>
+                                <small class="text-muted">Sample: Te-me_1.jpg</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="{{ url_for('load_sample', category='notumor') }}" class="btn btn-outline-secondary w-100 text-start p-3 d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong class="d-block text-dark">Healthy / No Tumor</strong>
+                                <small class="text-muted">Sample: Te-no_1.jpg</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="{{ url_for('load_sample', category='pituitary') }}" class="btn btn-outline-secondary w-100 text-start p-3 d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong class="d-block text-dark">Pituitary Tumor</strong>
+                                <small class="text-muted">Sample: Te-pi_1.jpg</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Image Inspector Column -->
+    <div class="col-lg-5">
+        <div class="content-card h-100">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-eye text-primary me-2"></i> Active Reference MRI</h5>
+            </div>
+            <div class="content-card-body text-center">
+                {% if active_image_url %}
+                <div class="image-box-wrapper mx-auto mb-3" style="max-width: 380px;">
+                    <img src="{{ active_image_url }}" alt="Active MRI Scan">
+                    <div class="image-box-label">{{ active_filename }}</div>
+                </div>
+
+                <div class="card bg-light border text-start p-3">
+                    <h6 class="fw-bold small text-muted text-uppercase mb-2">Standardized Slice Properties</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="py-1 d-flex justify-content-between border-bottom">
+                            <span class="text-muted">Resolution:</span>
+                            <span class="fw-semibold">512 × 512 Pixels</span>
+                        </li>
+                        <li class="py-1 d-flex justify-content-between border-bottom">
+                            <span class="text-muted">Color Space:</span>
+                            <span class="fw-semibold">Grayscale (1 Channel)</span>
+                        </li>
+                        <li class="py-1 d-flex justify-content-between border-bottom">
+                            <span class="text-muted">Normalized Intensity:</span>
+                            <span class="fw-semibold">[0.0, 1.0] Float32</span>
+                        </li>
+                        <li class="py-1 d-flex justify-content-between">
+                            <span class="text-muted">Pipeline Ready:</span>
+                            <span class="badge bg-success-subtle text-success">Verified</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mt-4 d-grid gap-2">
+                    <a href="{{ url_for('degrade_page') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i> Proceed to Degradation Simulation
+                    </a>
+                </div>
+                {% else %}
+                <div class="p-5 text-center text-muted">
+                    <i class="fa-solid fa-image fa-3x mb-3 text-secondary opacity-50"></i>
+                    <p class="mb-0">No active MRI slice selected. Please upload an image or choose a benchmark sample from the left.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

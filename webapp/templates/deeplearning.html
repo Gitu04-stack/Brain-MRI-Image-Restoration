@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Deep Learning Model - Brain MRI Restoration System{% endblock %}
+{% block header_title %}Deep Residual U-Net (ResUNet) Engine{% endblock %}
+{% block header_subtitle %}Deep Convolutional Neural Network with Global Residual Skip Connections for High-Frequency MRI Detail Recovery{% endblock %}
+
+{% block content %}
+<!-- Model Architecture Summary -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="content-card h-100 mb-0">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-network-wired text-primary me-2"></i> ResUNet Architectural Specification</h5>
+                <span class="badge bg-primary">Phase 12 Model</span>
+            </div>
+            <div class="content-card-body">
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 border rounded bg-light">
+                            <small class="text-muted text-uppercase fw-bold d-block">Network Depth</small>
+                            <span class="fs-5 fw-bold text-dark">4-Level Encoder/Decoder</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 border rounded bg-light">
+                            <small class="text-muted text-uppercase fw-bold d-block">Trainable Parameters</small>
+                            <span class="fs-5 fw-bold text-dark">1,926,433 Weights</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 border rounded bg-light">
+                            <small class="text-muted text-uppercase fw-bold d-block">Loss Objective</small>
+                            <span class="fs-5 fw-bold text-primary">Charbonnier Smooth L1</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 border rounded bg-light">
+                            <small class="text-muted text-uppercase fw-bold d-block">Optimization Strategy</small>
+                            <span class="fs-5 fw-bold text-dark">AdamW + Cosine Anneal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold small text-uppercase text-muted mb-2">Key Architectural Innovations:</h6>
+                <ul class="list-group list-group-flush small mb-0">
+                    <li class="list-group-item px-0">
+                        <i class="fa-solid fa-check text-success me-2"></i>
+                        <strong>Global Residual Learning:</strong> The network predicts the residual noise/artifact map $R(x)$, adding it to the input slice: $I_{\text{restored}} = \text{clamp}(I_{\text{degraded}} + R(x), 0.0, 1.0)$.
+                    </li>
+                    <li class="list-group-item px-0">
+                        <i class="fa-solid fa-check text-success me-2"></i>
+                        <strong>Multi-Scale Skip Connections:</strong> Preserves low-level anatomical edges and high-frequency boundary textures across contracting and expanding paths.
+                    </li>
+                    <li class="list-group-item px-0">
+                        <i class="fa-solid fa-check text-success me-2"></i>
+                        <strong>Edge-Preserving Charbonnier Loss:</strong> Prevents the over-smoothing typical of Mean Squared Error by using $\sqrt{(y - \hat{y})^2 + \epsilon^2}$.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Phase 12 Training Telemetry -->
+    <div class="col-lg-5">
+        <div class="content-card h-100 mb-0">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-microchip text-success me-2"></i> Phase 12 Training Telemetry</h5>
+                <span class="badge bg-success">Live Status</span>
+            </div>
+            <div class="content-card-body">
+                <div class="p-3 rounded-3 bg-light border mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold text-dark">Target Traditional Baseline</span>
+                        <span class="badge bg-secondary">10.42 dB (Wiener)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-primary">Best ResUNet Validation PSNR</span>
+                        <span class="badge bg-success fs-6">20.62 dB (+10.20 dB)</span>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold small text-uppercase text-muted mb-2">Epoch History Log:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle small mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Epoch</th>
+                                <th>Train Loss</th>
+                                <th>Val PSNR</th>
+                                <th>Val SSIM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ep in dl_history %}
+                            <tr {% if ep.val_psnr == best_psnr %}class="table-success-subtle fw-bold"{% endif %}>
+                                <td>Epoch {{ ep.epoch }}</td>
+                                <td>{{ ep.train_loss|round(5) }}</td>
+                                <td class="text-success">{{ ep.val_psnr|round(2) }} dB</td>
+                                <td class="text-primary">{{ ep.val_ssim|round(4) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info border-info-subtle small mt-4 mb-0">
+                    <i class="fa-solid fa-circle-info me-2"></i>
+                    <strong>Integration Note:</strong> Full live interactive neural inference will be activated in Phase 13 upon completion of all 10 epochs and final testing evaluation.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

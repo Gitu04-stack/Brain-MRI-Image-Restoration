@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Degradation Simulation - Brain MRI Restoration System{% endblock %}
+{% block header_title %}Degradation Modeling Engine{% endblock %}
+{% block header_subtitle %}Simulate clinical acquisition artifacts and physical MRI perturbations across 7 severity levels{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Controls Column -->
+    <div class="col-lg-5">
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-sliders text-primary me-2"></i> Degradation Parameters</h5>
+            </div>
+            <div class="content-card-body">
+                <form action="{{ url_for('apply_degradation_action') }}" method="POST">
+                    <!-- Distortion Type -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Select Degradation Condition</label>
+                        <select name="degradation_type" class="form-select form-select-lg mb-2" required>
+                            <option value="gaussian" {% if selected_deg == 'gaussian' %}selected{% endif %}>Additive White Gaussian Noise (AWGN)</option>
+                            <option value="rician" {% if selected_deg == 'rician' %}selected{% endif %}>Complex Rician Noise (Magnitude MRI)</option>
+                            <option value="low_resolution" {% if selected_deg == 'low_resolution' %}selected{% endif %}>Low-Resolution Subsampling (Matrix Truncation)</option>
+                            <option value="motion_blur" {% if selected_deg == 'motion_blur' %}selected{% endif %}>Linear Patient Motion Blur (45° Angle)</option>
+                            <option value="combined" {% if selected_deg == 'combined' or not selected_deg %}selected{% endif %}>Combined Distortion (Multi-Phase Degradation)</option>
+                        </select>
+                        <small class="text-muted d-block">
+                            *Combined uses the standardized sequence: Low-Resolution $\rightarrow$ Motion Blur $\rightarrow$ Rician Noise.
+                        </small>
+                    </div>
+
+                    <!-- Severity Slider -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-bold small text-uppercase text-muted mb-0">Artifact Severity Level</label>
+                            <span id="severityDisplay" class="badge bg-primary fs-6 px-3 py-1">{{ selected_severity or 30 }}%</span>
+                        </div>
+                        <input type="range" class="form-range" id="severitySlider" name="severity" min="10" max="70" step="10" value="{{ selected_severity or 30 }}">
+                        <div class="d-flex justify-content-between text-muted small px-1">
+                            <span>10% (Mild)</span>
+                            <span>40% (Moderate)</span>
+                            <span>70% (Severe)</span>
+                        </div>
+                    </div>
+
+                    <!-- Scientific Description Box -->
+                    <div class="p-3 bg-light rounded border mb-4 small text-secondary">
+                        <strong class="d-block text-dark mb-1"><i class="fa-solid fa-circle-info me-1 text-primary"></i> Physical Degradation Modeling:</strong>
+                        All artifacts are synthesized according to the rigorous mathematical formulas established in Phase 2 through Phase 9 of this project.
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                            <i class="fa-solid fa-play me-2"></i> Apply Degradation Distortion
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if degraded_image_url %}
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-chart-simple text-danger me-2"></i> Measured Degradation Impact</h5>
+            </div>
+            <div class="content-card-body">
+                <div class="row g-2 text-center">
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">PSNR</small>
+                            <span class="fs-5 fw-bold text-danger">{{ deg_metrics.psnr|round(2) }} dB</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">SSIM</small>
+                            <span class="fs-5 fw-bold text-danger">{{ deg_metrics.ssim|round(4) }}</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted d-block fw-semibold">MSE</small>
+                            <span class="fs-5 fw-bold text-danger">{{ deg_metrics.mse|round(4) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-grid">
+                    <a href="{{ url_for('restore_page') }}" class="btn btn-success fw-semibold">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Proceed to Restoration Filters
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Images Display Column -->
+    <div class="col-lg-7">
+        <div class="content-card">
+            <div class="content-card-header">
+                <h5 class="content-card-title"><i class="fa-solid fa-images text-primary me-2"></i> Live Image Inspection</h5>
+            </div>
+            <div class="content-card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="image-box-wrapper">
+                            {% if clean_image_url %}
+                            <img src="{{ clean_image_url }}" alt="Clean Ground Truth">
+                            {% else %}
+                            <div class="p-5 text-muted">No clean slice loaded</div>
+                            {% endif %}
+                            <div class="image-box-label text-success">
+                                <i class="fa-solid fa-circle-check me-1"></i> Clean Reference MRI
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="image-box-wrapper">
+                            {% if degraded_image_url %}
+                            <img src="{{ degraded_image_url }}" alt="Degraded MRI">
+                            <div class="image-box-label text-danger">
+                                <i class="fa-solid fa-triangle-exclamation me-1"></i> Degraded MRI ({{ selected_deg|title }} {{ selected_severity }}%)
+                            </div>
+                            {% else %}
+                            <div class="p-5 text-muted">
+                                <i class="fa-solid fa-flask fa-2x mb-2 text-secondary opacity-50 d-block"></i>
+                                Select parameters and click Apply to synthesize degradation
+                            </div>
+                            <div class="image-box-label text-muted">Degraded Output</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
