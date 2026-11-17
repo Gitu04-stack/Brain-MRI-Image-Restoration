@@ -5,11 +5,32 @@
 {% block header_subtitle %}Direct visual inspection of anatomical fidelity across Clean Reference, Degraded Input, and Restored Outputs{% endblock %}
 
 {% block content %}
+{% if recommendation %}
+<div class="alert alert-success border-success mb-4 p-3 shadow-sm d-flex align-items-center justify-content-between">
+    <div>
+        <span class="badge bg-success me-2"><i class="fa-solid fa-award me-1"></i> {{ recommendation.badge }}</span>
+        <strong class="text-success-emphasis">Recommendation for {{ selected_deg|replace('_', ' ')|title }}:</strong>
+        <span class="text-dark ms-1">{{ recommendation.name }} ({{ recommendation.psnr }} PSNR)</span>
+        <small class="text-muted d-block mt-1">{{ recommendation.reason }}</small>
+    </div>
+    {% if restored_filename %}
+    <a href="{{ url_for('download_image', filename=restored_filename) }}" class="btn btn-sm btn-success fw-semibold text-nowrap ms-3">
+        <i class="fa-solid fa-download me-1"></i> Download Restored
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
 <!-- Three-Way Triplet Comparison -->
 <div class="content-card mb-4">
     <div class="content-card-header">
         <h5 class="content-card-title"><i class="fa-solid fa-table-columns text-primary me-2"></i> Primary Triplet Comparison</h5>
         <div class="d-flex gap-2">
+            {% if restored_filename %}
+            <a href="{{ url_for('download_image', filename=restored_filename) }}" class="btn btn-sm btn-outline-success">
+                <i class="fa-solid fa-download me-1"></i> Download Slice
+            </a>
+            {% endif %}
             <a href="{{ url_for('metrics_page') }}" class="btn btn-sm btn-outline-primary">
                 <i class="fa-solid fa-calculator me-1"></i> Metric Deep Dive
             </a>
@@ -30,7 +51,7 @@
                     </div>
                     <div class="mt-3">
                         <strong class="d-block text-dark">Clean Reference MRI</strong>
-                        <small class="text-muted">PSNR: $\infty$ | SSIM: 1.0000</small>
+                        <small class="text-muted">PSNR: &infin; | SSIM: 1.0000</small>
                     </div>
                 </div>
             </div>
@@ -71,7 +92,7 @@
                         {% endif %}
                     </div>
                     <div class="mt-3">
-                        <strong class="d-block text-primary">Restored: {{ selected_res|replace('_', ' ')|title or 'Traditional' }}</strong>
+                        <strong class="d-block text-primary">Restored: {{ selected_res|replace('_', ' ')|title or 'Deep ResUNet' }}</strong>
                         {% if restored_metrics %}
                         <small class="text-success fw-semibold">
                             PSNR: {{ restored_metrics.psnr|round(2) }} dB | SSIM: {{ restored_metrics.ssim|round(4) }}
@@ -89,20 +110,33 @@
 <!-- Multi-Method Comparison Grid (If All Methods Run) -->
 {% if multi_results %}
 <div class="content-card">
-    <div class="content-card-header">
-        <h5 class="content-card-title"><i class="fa-solid fa-layer-group text-primary me-2"></i> Multi-Method Spatial Restoration Comparison</h5>
+    <div class="content-card-header d-flex justify-content-between align-items-center">
+        <h5 class="content-card-title"><i class="fa-solid fa-layer-group text-primary me-2"></i> Multi-Method Restoration Benchmark Comparison</h5>
+        <span class="badge bg-primary">5 Restorations Concurrently Evaluated</span>
     </div>
     <div class="content-card-body">
-        <div class="row g-4">
+        <div class="row g-4 justify-content-center">
             {% for key, res in multi_results.items() %}
-            <div class="col-md-6 col-xl-3 text-center">
-                <div class="image-box-wrapper">
-                    <img src="{{ res.url }}" alt="{{ res.name }}">
+            <div class="col-md-4 col-lg text-center" style="min-width: 200px;">
+                <div class="image-box-wrapper h-100 d-flex flex-column justify-content-between p-2 border {% if key == 'deep_resunet' %}border-success shadow-sm bg-success-subtle{% endif %}">
+                    <div>
+                        {% if key == 'deep_resunet' %}
+                        <span class="badge bg-success mb-1">Deep Learning (Ours)</span>
+                        {% else %}
+                        <span class="badge bg-secondary mb-1">Classical Filter</span>
+                        {% endif %}
+                        <img src="{{ res.url }}" alt="{{ res.name }}">
+                    </div>
                     <div class="mt-2">
                         <strong class="d-block text-dark small fw-bold">{{ res.name }}</strong>
                         <div class="d-flex justify-content-center gap-1 mt-1">
-                            <span class="badge bg-success-subtle text-success border small">{{ res.psnr|round(2) }} dB</span>
-                            <span class="badge bg-primary-subtle text-primary border small">SSIM {{ res.ssim|round(4) }}</span>
+                            <span class="badge bg-success text-white small">{{ res.psnr|round(2) }} dB</span>
+                            <span class="badge bg-primary text-white small">SSIM {{ res.ssim|round(4) }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <a href="{{ url_for('download_image', filename=res.filename) }}" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-download"></i> Save
+                            </a>
                         </div>
                     </div>
                 </div>

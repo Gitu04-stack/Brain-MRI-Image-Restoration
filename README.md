@@ -96,13 +96,23 @@ flowchart LR
 | **#3** | Non-Local Means (NLM) | 8.82 dB | ±5.26 | 0.0528 | ±0.0767 | 0.2108 |
 | **#4** | Lanczos Sharpening | 6.91 dB | ±3.46 | 0.0209 | ±0.0297 | 0.2557 |
 
-### Phase 12 Deep ResUNet Performance vs. Traditional Baseline
+### Phase 12 Deep ResUNet Training Progression vs. Baseline
 
-| Metric | Traditional Wiener Baseline | Deep ResUNet (Epoch 6 Peak) | Performance Gain |
+| Metric | Traditional Wiener Baseline | Deep ResUNet (Epoch 9 Peak) | Performance Gain |
 | :--- | :---: | :---: | :---: |
-| **Validation PSNR** | 10.42 dB | **21.07 dB** | **+10.65 dB (Doubled Signal Quality)** |
-| **Validation SSIM** | 0.1808 | **0.5001** | **+0.3193 (2.77× Structural Fidelity)** |
-| **Training Loss** | N/A | **0.04828** | Continuous Downward Convergence |
+| **Validation PSNR** | 10.42 dB | **21.91 dB** | **+11.49 dB (+110.3% Signal Quality)** |
+| **Validation SSIM** | 0.1808 | **0.5265** | **+0.3457 (2.91× Structural Fidelity)** |
+| **Final Train Loss** | N/A | **0.04544** (Epoch 10) | Stable Convergence across 35,280 scans |
+
+### Phase 13 Definitive Unseen Testing Benchmark (11,200 Scans Across 7 Severities)
+
+| Rank | Paradigm | Restoration Algorithm | Test PSNR (dB) ↑ | Test SSIM ↑ | Test MSE ↓ | Gain vs. Wiener Baseline |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: |
+| **#1** | **Deep Learning** | **Deep Residual U-Net (Ours)** | **21.92 dB** (±6.13) | **0.5370** (±0.190) | **0.0157** (±0.020) | **+11.50 dB PSNR / +0.3562 SSIM (2.97× Fidelity)** |
+| **#2** | Traditional Filter | Adaptive Wiener Filter (5×5) | 10.42 dB (±5.76) | 0.1808 (±0.137) | 0.1612 (±0.125) | Baseline (#1 Classical Method) |
+| **#3** | Traditional Filter | Spatial Median Filter (3×3) | 10.13 dB (±6.15) | 0.1208 (±0.134) | 0.1874 (±0.162) | -0.29 dB PSNR / -0.0600 SSIM |
+| **#4** | Traditional Filter | Non-Local Means (NLM) | 8.82 dB (±5.26) | 0.0528 (±0.077) | 0.2108 (±0.149) | -1.60 dB PSNR / -0.1280 SSIM |
+| **#5** | Traditional Filter | Lanczos + Sharpening | 6.91 dB (±3.46) | 0.0209 (±0.030) | 0.2557 (±0.133) | -3.51 dB PSNR / -0.1599 SSIM |
 
 ---
 
@@ -124,7 +134,9 @@ Brain-MRI-Image-Restoration/
 │   ├── 08_testing_evaluation.ipynb
 │   ├── 09_combined_degradation.ipynb
 │   ├── 10_combined_restoration.ipynb
-│   └── 11_combined_testing.ipynb
+│   ├── 11_combined_testing.ipynb
+│   ├── 12_cnn_dnn_training.ipynb
+│   └── 13_deep_learning_evaluation.ipynb
 ├── src/                           # Modular scientific source code
 │   ├── __init__.py
 │   ├── dataset.py                 # PyTorch CombinedMRIDataset
@@ -208,8 +220,15 @@ http://127.0.0.1:5000
 * [x] **Phase 9**: Combined multi-degradation dataset generation (50,400 paired scans).
 * [x] **Phase 10**: Traditional restoration benchmarking on combined distortions (201,600 evaluations).
 * [x] **Phase 11**: Final traditional benchmark synthesis (Wiener confirmed as #1 baseline).
-* [x] **Phase 12 (In Active Progress)**: Deep Residual U-Net training (Epoch 6 of 10 completed with cuDNN autotuning; peak PSNR **21.07 dB**, peak SSIM **0.5001**; Epoch 7 actively training).
-* [ ] **Phase 13**: Unseen testing evaluation of trained Deep ResUNet model against Phase 11 baseline.
+* [x] **Phase 12**: Deep Residual U-Net training completed (10/10 epochs; peak PSNR **21.91 dB**, peak SSIM **0.5265**; checkpoints saved).
+* [x] **Phase 13**: Unseen testing evaluation completed across 11,200 scans (Deep ResUNet confirmed #1 overall at **21.92 dB PSNR**, **0.5370 SSIM**, surpassing Wiener baseline by **+11.50 dB**).
+* [x] **Phase 14**: Final experimental results verification & consolidated cross-condition benchmark completed.
+* [x] **Phase 15**: Complete Flask web application built with responsive UI, real-time artifact studio, 5-way comparisons, recommendations, and downloads.
+* [x] **Phase 16**: Deep ResUNet model integrated into Flask web application with CPU/CUDA singleton caching and mixed-precision inference.
+* [x] **Phase 17**: Comprehensive automated test suite executed with 37/37 tests passing (100% success rate).
+* [x] **Phase 18**: Final academic project report compiled and saved directly to Windows Desktop (`Final_Project_Report.docx` and `Final_Project_Report.pdf`).
+* [x] **Phase 19**: College demonstration & viva PowerPoint presentation created and saved directly to Windows Desktop (`Final_Project_Presentation.pptx`).
+* [x] **Phase 20**: Final project verification and GitHub repository audit.
 
 ---
 

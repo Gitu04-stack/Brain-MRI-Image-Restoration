@@ -27,3 +27,9 @@ werkzeug>=3.0.0
 nbformat>=5.9.0
 nbclient>=0.8.0
 ipykernel>=6.25.0
+
+# Document & Presentation Generation (Phases 18 & 19)
+python-docx>=1.1.0
+python-pptx>=1.0.0
+reportlab>=4.0.0
+

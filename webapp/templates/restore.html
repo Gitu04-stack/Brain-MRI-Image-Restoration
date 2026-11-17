@@ -13,14 +13,38 @@
                 <h5 class="content-card-title"><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i> Restoration Algorithms</h5>
             </div>
             <div class="content-card-body">
+                {% if recommendation %}
+                <div class="alert alert-success border-success mb-3 p-3 shadow-sm">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="badge bg-success me-2"><i class="fa-solid fa-star me-1"></i> {{ recommendation.badge }}</span>
+                        <strong class="text-success-emphasis">Empirical Recommendation</strong>
+                    </div>
+                    <div class="small text-dark">
+                        For <strong>{{ selected_deg|replace('_', ' ')|title }}</strong> artifacts, our verified research confirms <strong>{{ recommendation.name }}</strong> achieves peak fidelity (<strong>{{ recommendation.psnr }}</strong>).
+                    </div>
+                    <small class="text-muted d-block mt-1 fst-italic">{{ recommendation.reason }}</small>
+                </div>
+                {% endif %}
+
                 <form action="{{ url_for('apply_restoration_action') }}" method="POST">
                     <div class="mb-4">
-                        <label class="form-label fw-bold small text-uppercase text-muted">Select Restoration Filter</label>
+                        <label class="form-label fw-bold small text-uppercase text-muted">Select Restoration Paradigm / Filter</label>
                         <select name="restoration_method" class="form-select form-select-lg mb-2" required>
-                            <option value="wiener" {% if selected_res == 'wiener' or not selected_res %}selected{% endif %}>Adaptive Wiener Filter (5×5 Window) [Rank #1 Benchmark]</option>
-                            <option value="median_filter" {% if selected_res == 'median_filter' %}selected{% endif %}>Spatial Median Filter (3×3 Kernel)</option>
-                            <option value="nlm" {% if selected_res == 'nlm' %}selected{% endif %}>Non-Local Means (NLM Denoising, h=10)</option>
-                            <option value="lanczos_sharpening" {% if selected_res == 'lanczos_sharpening' %}selected{% endif %}>Lanczos Edge Sharpening (Unsharp Mask)</option>
+                            <option value="deep_resunet" {% if selected_res == 'deep_resunet' or (not selected_res and selected_deg == 'combined') %}selected{% endif %}>
+                                🏆 Deep Residual U-Net (ResUNet - Ours) [Best for Combined, +11.50 dB]
+                            </option>
+                            <option value="wiener" {% if selected_res == 'wiener' or (not selected_res and selected_deg in ['gaussian', 'rician']) %}selected{% endif %}>
+                                Adaptive Wiener Filter (5×5 Window) [#1 Classical Filter]
+                            </option>
+                            <option value="median_filter" {% if selected_res == 'median_filter' %}selected{% endif %}>
+                                Spatial Median Filter (3×3 Kernel)
+                            </option>
+                            <option value="nlm" {% if selected_res == 'nlm' %}selected{% endif %}>
+                                Non-Local Means (NLM Denoising, h=10)
+                            </option>
+                            <option value="lanczos_sharpening" {% if selected_res == 'lanczos_sharpening' or (not selected_res and selected_deg in ['low_resolution', 'motion_blur']) %}selected{% endif %}>
+                                Lanczos Edge Sharpening (Unsharp Mask)
+                            </option>
                         </select>
                     </div>
 
@@ -31,7 +55,7 @@
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary py-2 fw-semibold">
-                            <i class="fa-solid fa-play me-2"></i> Execute Restoration Filter
+                            <i class="fa-solid fa-play me-2"></i> Execute Restoration
                         </button>
                     </div>
                 </form>
@@ -41,7 +65,7 @@
                 <!-- Run All Methods Button -->
                 <form action="{{ url_for('apply_all_restorations_action') }}" method="POST">
                     <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-semibold">
-                        <i class="fa-solid fa-layer-group me-2"></i> Run All 4 Methods (Comparative Run)
+                        <i class="fa-solid fa-layer-group me-2"></i> Run All 5 Methods (Comparative Benchmark)
                     </button>
                 </form>
             </div>

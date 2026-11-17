@@ -5,6 +5,115 @@
 {% block header_subtitle %}Analysis drawn directly from verified experiment output tables across 44,800 testing evaluations{% endblock %}
 
 {% block content %}
+<!-- Phase 14 Peak Method by Condition Card -->
+{% if best_methods_data %}
+<div class="content-card mb-4 border-success">
+    <div class="content-card-header d-flex justify-content-between align-items-center bg-success-subtle">
+        <h5 class="content-card-title text-success-emphasis mb-0"><i class="fa-solid fa-trophy text-success me-2"></i> Phase 14: Optimal Restoration Technique by Degradation Condition</h5>
+        <span class="badge bg-success">Synthesized Empirical Gold Standard</span>
+    </div>
+    <div class="content-card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Degradation Regime</th>
+                        <th>Recommended Winner</th>
+                        <th>Peak PSNR (dB) &uarr;</th>
+                        <th>Peak SSIM &uarr;</th>
+                        <th>Lowest MSE &darr;</th>
+                        <th>Scientific Rationale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in best_methods_data %}
+                    <tr class="fw-semibold">
+                        <td><span class="badge bg-dark">{{ row.degradation_condition|replace('_', ' ')|upper }}</span></td>
+                        <td><strong class="text-primary">{{ row.best_method_psnr }}</strong></td>
+                        <td class="text-success fw-bold">{{ row.best_psnr_db|round(2) }} dB</td>
+                        <td class="text-primary fw-bold">{{ row.best_ssim|round(4) }}</td>
+                        <td>{{ row.lowest_mse|round(4) }}</td>
+                        <td class="small text-muted">
+                            {% if row.degradation_condition == 'gaussian' %}
+                            Local variance estimation optimally suppresses stationary Gaussian noise.
+                            {% elif row.degradation_condition == 'rician' %}
+                            Effective minimum-MSE recovery for non-central Rician distributions.
+                            {% elif row.degradation_condition == 'low_resolution' %}
+                            Lanczos kernel combined with unsharp sharpening reconstructs pixel matrices.
+                            {% elif row.degradation_condition == 'motion_blur' %}
+                            Edge sharpening counteracts oriented linear point-spread function blur.
+                            {% else %}
+                            Multi-scale ResUNet with Charbonnier loss surmounts classical filtering limits by +11.50 dB.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Phase 13 Deep Learning vs Traditional Definitive Benchmark Table -->
+{% if deep_bench_summary %}
+<div class="content-card mb-4 border-primary">
+    <div class="content-card-header d-flex justify-content-between align-items-center bg-primary-subtle">
+        <h5 class="content-card-title text-primary-emphasis mb-0"><i class="fa-solid fa-chart-simple text-primary me-2"></i> Phase 13: Definitive Unseen Testing Benchmark (11,200 Scans)</h5>
+        <span class="badge bg-primary">Full 11,200 Scans Evaluated</span>
+    </div>
+    <div class="content-card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Rank</th>
+                        <th>Restoration Technique</th>
+                        <th>Paradigm</th>
+                        <th>Test PSNR (dB) &uarr;</th>
+                        <th>Test SSIM &uarr;</th>
+                        <th>Test MSE &darr;</th>
+                        <th>Advantage vs. Wiener Baseline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in deep_bench_summary %}
+                    <tr {% if row.rank == 1 %}class="table-success-subtle fw-bold"{% endif %}>
+                        <td>
+                            <span class="badge {% if row.rank == 1 %}bg-success{% elif row.rank == 2 %}bg-primary{% else %}bg-secondary{% endif %} rounded-circle p-2">
+                                #{{ row.rank }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong>{{ row.algorithm }}</strong>
+                            {% if row.rank == 1 %}
+                            <span class="badge bg-success ms-2">Project Winner (+11.50 dB)</span>
+                            {% elif row.rank == 2 %}
+                            <span class="badge bg-secondary ms-2">Classical Winner</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-light text-dark border">{{ row.paradigm }}</span></td>
+                        <td class="{% if row.rank == 1 %}text-success fw-bold{% endif %}">{{ row.test_psnr|round(2) }} dB</td>
+                        <td class="{% if row.rank == 1 %}text-primary fw-bold{% endif %}">{{ row.test_ssim|round(4) }}</td>
+                        <td>{{ row.test_mse|round(4) }}</td>
+                        <td>
+                            {% if row.rank == 1 %}
+                            <span class="badge bg-success">+11.50 dB PSNR / +0.3562 SSIM (2.97×)</span>
+                            {% elif row.rank == 2 %}
+                            <span class="badge bg-secondary">Baseline Benchmark</span>
+                            {% else %}
+                            <span class="text-danger small">{{ row.psnr_gain_vs_wiener|round(2) }} dB</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Phase 11 Overall Testing Summary Table -->
 <div class="content-card mb-4">
     <div class="content-card-header">

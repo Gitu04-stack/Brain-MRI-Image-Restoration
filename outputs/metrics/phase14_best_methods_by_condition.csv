@@ -1,0 +1,6 @@
+degradation_condition,best_method_psnr,best_psnr_db,best_method_ssim,best_ssim,lowest_mse
+gaussian,Adaptive Wiener Filter (5x5),18.736539285714287,Adaptive Wiener Filter (5x5),0.2727785714285714,0.020524999999999998
+rician,Adaptive Wiener Filter (5x5),10.503042857142857,Adaptive Wiener Filter (5x5),0.21584642857142858,0.16037857142857143
+low_resolution,Lanczos + Sharpening,37.44699285714285,Lanczos + Sharpening,0.9746714285714286,0.00024285714285714289
+motion_blur,Lanczos + Sharpening,27.823385714285713,Lanczos + Sharpening,0.8267714285714286,0.0030714285714285717
+combined,Deep Residual U-Net (ResUNet),21.92004877480268,Deep Residual U-Net (ResUNet),0.5370239323117557,0.015655537992852415
